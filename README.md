@@ -6,7 +6,7 @@ Local text-to-speech on Apple Silicon, powered by [Qwen3-TTS](https://huggingfac
 
 - macOS with Apple Silicon (M1 or later)
 - Python 3.10+ (3.12 recommended)
-- [Homebrew](https://brew.sh) (for ffmpeg)
+- [Homebrew](https://brew.sh)
 
 ## Setup
 
