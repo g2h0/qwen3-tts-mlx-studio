@@ -32,9 +32,9 @@ If you don't have Homebrew yet, open Terminal and paste:
 
 **Voice Library** — Browse, preview, rename, delete, and import saved voices. Voices from Voice Design, Voice Cloning, and YT Voice Clone all appear here.
 
-**History** — Every generation is logged with mode, language, text, and duration. Replay audio, save WAV files, or view original parameters.
+**History** — Every generation is logged with mode, language, text, and duration. Replay audio, save files, or view original parameters.
 
-**Settings** — Model size and quantization, generation parameters (temperature, top-k, top-p, repetition penalty, max tokens, timeout), output directory, auto-save toggle, JIT compilation toggle, ASR model management, YT cache management, and model cache management (view/delete downloaded models).
+**Settings** — Model size and quantization, generation parameters (temperature, top-k, top-p, repetition penalty, max tokens, timeout), output directory, auto-save toggle, export format (WAV/MP3/OGG) with MP3 bitrate selector, post-processing (EBU R128 loudness normalization, silence trimming), JIT compilation toggle, ASR model management, YT cache management, and model cache management (view/delete downloaded models).
 
 ## Setup
 
@@ -115,7 +115,7 @@ huggingface-cli download mlx-community/Qwen3-ASR-1.7B-8bit
 
 ## Output
 
-Audio is 24 kHz mono WAV (32-bit float), saved to `./outputs/` by default. Transcriptions are saved as `.txt` files in the same directory. Voice library profiles are stored in `./voices/`.
+Audio is generated at 24 kHz mono and saved to `./outputs/` by default. Supported export formats are WAV (32-bit float), MP3 (configurable bitrate), and OGG/Vorbis — selectable in Settings. Optional post-processing includes EBU R128 loudness normalization and leading/trailing silence trimming (both via ffmpeg). Transcriptions are saved as `.txt` files in the same directory. Voice library profiles are stored in `./voices/`.
 
 ## Supported Languages
 
@@ -128,7 +128,7 @@ app.py            — Gradio UI, tabs, and event wiring
 engine.py         — Model load/unload/inference (thread-safe, TTS + ASR)
 voice_library.py  — Voice profile storage
 yt_voice.py       — YouTube clip extraction and subtitle alignment
-audio_utils.py    — Audio concatenation and text splitting
+audio_utils.py    — Audio concatenation, text splitting, and format export
 script_parser.py  — Multi-speaker script parser
 history.py        — Generation history log
 config.py         — Constants and defaults
