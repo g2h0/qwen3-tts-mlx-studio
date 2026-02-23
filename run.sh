@@ -42,7 +42,7 @@ gum style --border rounded --border-foreground "$C_BLUE" \
     --foreground "$C_TEXT" --bold --padding "1 4" --align center \
     "Qwen3-TTS MLX Studio"
 echo ""
-gum style --foreground "$C_MUTED" "  The UI will open at: $(gum style --foreground "$C_CYAN" --bold "http://localhost:7860")"
+gum style --foreground "$C_MUTED" "  The UI will open in your browser at: $(gum style --foreground "$C_CYAN" --bold "http://localhost:7860")"
 gum style --foreground "$C_MUTED" "  Press Ctrl+C to stop"
 echo ""
 

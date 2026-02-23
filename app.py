@@ -2280,6 +2280,7 @@ if __name__ == "__main__":
         server_name=args.host,
         server_port=args.port,
         share=args.share,
+        inbrowser=True,
         css=custom_css,
         theme=build_theme(),
     )
