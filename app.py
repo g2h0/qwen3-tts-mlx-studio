@@ -1135,6 +1135,27 @@ def apply_settings(
     return msg, msg, lang_update, lang_update, lang_update, lang_update, lang_update, lang_update
 
 
+GENERATION_PRESETS = {
+    "Balanced": (0.9, 50, 1.0, 1.05, 4096, 120),
+    "Creative": (1.2, 80, 0.95, 1.0, 4096, 120),
+    "Precise": (0.3, 20, 0.9, 1.1, 4096, 120),
+}
+
+
+def apply_preset(preset_name):
+    if preset_name == "Custom" or preset_name not in GENERATION_PRESETS:
+        return [gr.update()] * 6
+    temp, top_k, top_p, rep_pen, max_tok, timeout = GENERATION_PRESETS[preset_name]
+    return (
+        gr.update(value=temp),
+        gr.update(value=top_k),
+        gr.update(value=top_p),
+        gr.update(value=rep_pen),
+        gr.update(value=max_tok),
+        gr.update(value=timeout),
+    )
+
+
 def reset_generation_defaults():
     return (
         gr.update(value=DEFAULT_TEMPERATURE),
@@ -1143,6 +1164,7 @@ def reset_generation_defaults():
         gr.update(value=DEFAULT_REPETITION_PENALTY),
         gr.update(value=DEFAULT_MAX_TOKENS),
         gr.update(value=DEFAULT_TIMEOUT),
+        gr.update(value="Balanced"),
     )
 
 
@@ -1726,7 +1748,7 @@ with gr.Blocks(title="Qwen3-TTS Studio") as app:
         # =================================================================
         with gr.Tab("Settings"):
             with gr.Row():
-                # --- Model column ---
+                # --- Column 1: Model & Language ---
                 with gr.Column(scale=1):
                     gr.Markdown("### Model")
                     set_size = gr.Radio(
@@ -1750,34 +1772,47 @@ with gr.Blocks(title="Qwen3-TTS Studio") as app:
                         value=ENABLE_JIT_COMPILE,
                         label="JIT compile model (faster after first run; unloads model on change)",
                     )
-                    gr.Markdown("### Model Cache")
-                    gr.Textbox(
-                        label="HuggingFace Cache Directory",
-                        value=os.path.abspath(_get_hf_cache_dir()),
-                        interactive=False,
-                        elem_classes=["model-status"],
+                    gr.Markdown("### Language")
+                    set_default_language = gr.Dropdown(
+                        choices=LANGUAGES,
+                        value="English",
+                        label="Default Language",
                     )
-                    set_delete_models = gr.Button(
-                        "Delete Downloaded Models",
-                        variant="stop",
-                    )
-                    set_delete_status = gr.Textbox(
-                        show_label=False, interactive=False,
-                        placeholder="Models will be re-downloaded on next use.",
-                        elem_classes=["save-status-text"],
-                    )
-                    gr.Markdown("### Speech Recognition")
-                    set_asr_status = gr.Textbox(
-                        label="ASR Model",
-                        value="Not loaded (loads on demand)",
-                        interactive=False,
-                        elem_classes=["model-status"],
-                    )
-                    set_asr_unload = gr.Button("Unload ASR Model")
+                    with gr.Accordion("Model Cache & ASR", open=False, elem_classes=["settings-accordion"]):
+                        gr.Markdown("### Model Cache")
+                        gr.Textbox(
+                            label="HuggingFace Cache Directory",
+                            value=os.path.abspath(_get_hf_cache_dir()),
+                            interactive=False,
+                            elem_classes=["model-status"],
+                        )
+                        set_delete_models = gr.Button(
+                            "Delete Downloaded Models",
+                            variant="stop",
+                        )
+                        set_delete_status = gr.Textbox(
+                            show_label=False, interactive=False,
+                            placeholder="Models will be re-downloaded on next use.",
+                            elem_classes=["save-status-text"],
+                        )
+                        gr.Markdown("### Speech Recognition")
+                        set_asr_status = gr.Textbox(
+                            label="ASR Model",
+                            value="Not loaded (loads on demand)",
+                            interactive=False,
+                            elem_classes=["model-status"],
+                        )
+                        set_asr_unload = gr.Button("Unload ASR Model")
 
-                # --- Generation column ---
+                # --- Column 2: Generation ---
                 with gr.Column(scale=1):
                     gr.Markdown("### Generation")
+                    set_preset = gr.Radio(
+                        ["Balanced", "Creative", "Precise", "Custom"],
+                        value="Balanced",
+                        label="Generation Presets",
+                        info="Presets fill sliders below. Adjust freely afterward.",
+                    )
                     set_temperature = gr.Slider(
                         0.0, 1.5, value=DEFAULT_TEMPERATURE, step=0.05,
                         label="Temperature",
@@ -1804,7 +1839,7 @@ with gr.Blocks(title="Qwen3-TTS Studio") as app:
                     )
                     set_reset = gr.Button("Reset to Defaults")
 
-                # --- Output column ---
+                # --- Column 3: Output ---
                 with gr.Column(scale=1):
                     gr.Markdown("### Output")
                     set_output_dir = gr.Textbox(
@@ -1835,31 +1870,27 @@ with gr.Blocks(title="Qwen3-TTS Studio") as app:
                         value=DEFAULT_TRIM_SILENCE,
                         label="Trim leading/trailing silence",
                     )
-                    set_default_language = gr.Dropdown(
-                        choices=LANGUAGES,
-                        value="English",
-                        label="Default Language",
-                    )
-                    gr.Markdown("### YT Cache")
-                    set_yt_cache_btn = gr.Button("Clear YT Cache")
-                    set_yt_cache_status = gr.Textbox(
-                        show_label=False, interactive=False,
-                        placeholder=f"Cache: {YT_CACHE_DIR}/",
-                        elem_classes=["save-status-text"],
-                    )
-                    gr.Markdown("### Storage Paths")
-                    gr.Textbox(
-                        label="Voice Library",
-                        value=os.path.abspath(VOICE_LIBRARY_DIR),
-                        interactive=False,
-                        elem_classes=["model-status"],
-                    )
-                    gr.Textbox(
-                        label="History",
-                        value=os.path.abspath(HISTORY_DIR),
-                        interactive=False,
-                        elem_classes=["model-status"],
-                    )
+                    with gr.Accordion("Storage & Cache", open=False, elem_classes=["settings-accordion"]):
+                        gr.Markdown("### YT Cache")
+                        set_yt_cache_btn = gr.Button("Clear YT Cache")
+                        set_yt_cache_status = gr.Textbox(
+                            show_label=False, interactive=False,
+                            placeholder=f"Cache: {YT_CACHE_DIR}/",
+                            elem_classes=["save-status-text"],
+                        )
+                        gr.Markdown("### Storage Paths")
+                        gr.Textbox(
+                            label="Voice Library",
+                            value=os.path.abspath(VOICE_LIBRARY_DIR),
+                            interactive=False,
+                            elem_classes=["model-status"],
+                        )
+                        gr.Textbox(
+                            label="History",
+                            value=os.path.abspath(HISTORY_DIR),
+                            interactive=False,
+                            elem_classes=["model-status"],
+                        )
 
             set_apply = gr.Button("Apply Settings", variant="primary")
 
@@ -2218,9 +2249,14 @@ with gr.Blocks(title="Qwen3-TTS Studio") as app:
             cv_language, vd_language, vc_language, yt_language, asr_language, lib_import_language,
         ],
     )
+    set_preset.change(
+        fn=apply_preset,
+        inputs=[set_preset],
+        outputs=[set_temperature, set_top_k, set_top_p, set_rep_penalty, set_max_tokens, set_timeout],
+    )
     set_reset.click(
         fn=reset_generation_defaults,
-        outputs=[set_temperature, set_top_k, set_top_p, set_rep_penalty, set_max_tokens, set_timeout],
+        outputs=[set_temperature, set_top_k, set_top_p, set_rep_penalty, set_max_tokens, set_timeout, set_preset],
     )
     set_unload.click(
         fn=unload_model,

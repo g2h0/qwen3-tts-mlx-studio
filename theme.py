@@ -119,6 +119,10 @@ textarea, input[type="text"] { background-color: #24283b !important; color: #c0c
 .lib-save-accordion { border: 1px dashed #3b4261 !important; border-radius: 6px !important; margin-top: 6px !important; }
 .lib-save-accordion > .label-wrap { font-size: 0.88em !important; color: #565f89 !important; padding: 5px 10px !important; }
 
+/* Settings tab collapsible sections */
+.settings-accordion { border: 1px solid #3b4261 !important; border-radius: 8px; margin-top: 10px; }
+.settings-accordion > .label-wrap { padding: 6px 12px !important; font-size: 0.88em !important; color: #565f89 !important; }
+
 /* Settings panel groups */
 .settings-group {
     background: rgba(36, 40, 59, 0.5) !important;
