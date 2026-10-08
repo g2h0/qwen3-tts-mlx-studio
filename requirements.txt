@@ -10,7 +10,11 @@ gradio>=5.0,<7
 soundfile>=0.13
 # <2.5 because numba (installed alongside librosa) requires numpy<2.5.
 numpy>=2.0,<2.5
-yt-dlp>=2024.1
+# YouTube rotates its anti-download measures; older yt-dlp gets HTTP 403 from
+# googlevideo on clip extraction (2026.07.04 broke: android_vr URLs rejected).
+# [default] pulls in yt-dlp-ejs (JS challenge solver). 2026.8.19 verified
+# 2026-10-08. If extraction 403s again, upgrade yt-dlp first.
+yt-dlp[default]>=2026.8.19
 pysrt>=1.1
 # transformers is not imported directly — floor mirrors mlx-audio 0.4.8's own
 # requirement (>=5.14); <6 keeps the tokenizer stack on a known major.

@@ -202,6 +202,8 @@ before raising either — CI can prove they install, not that they work.
 
 **ffmpeg not found** — Install it with `brew install ffmpeg`. It's required for audio processing and YouTube clip extraction.
 
+**YouTube clip extraction fails with "403 Forbidden"** — YouTube changes its download protections regularly, and older yt-dlp versions stop working. Upgrade it with `.venv/bin/pip install -U "yt-dlp[default]"`. Installing [Deno](https://deno.com) (`brew install deno`) is also recommended; yt-dlp uses it to solve YouTube's JavaScript challenges.
+
 **Generation runs away on number-heavy text** — Dates, scientific notation, and acronym lists can make the model keep talking far past the end of your text. Press **Stop**; it keeps the audio generated so far. The auto-stop timeout in Settings does the same automatically, and lowering "Max length (tokens)" caps the damage entirely.
 
 ## License
